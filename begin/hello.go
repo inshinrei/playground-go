@@ -2,20 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
-func hello(res http.ResponseWriter, _ *http.Request) {
-	_, err := fmt.Fprint(res, "hey")
-	if err != nil {
-		return
-	}
-}
-
 func main() {
-	http.HandleFunc("/", hello)
-	err := http.ListenAndServe("localhost:4040", nil)
-	if err != nil {
-		return
-	}
+	resp, _ := http.Get("http://google.com")
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
+	resp.Body.Close()
 }
