@@ -2,13 +2,19 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"time"
 )
 
+func count() {
+	for i := 0; i < 5; i++ {
+		fmt.Println(i)
+		time.Sleep(1 * time.Millisecond)
+	}
+}
+
 func main() {
-	resp, _ := http.Get("http://google.com")
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
-	resp.Body.Close()
+	go count()
+	time.Sleep(time.Millisecond * 2)
+	fmt.Println("oops")
+	time.Sleep(time.Millisecond * 5)
 }
