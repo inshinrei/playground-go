@@ -51,3 +51,16 @@ func (node BNode) setValue(idx uint16, value uint64) {
 	pos := 4 + 8*idx
 	binary.LittleEndian.PutUint64(node[pos:], value)
 }
+
+func (node BNode) getOffset(idx uint16) uint16 {
+	if idx == 0 {
+		return 0
+	}
+	pos := 4 + 8*node.nkeys() + 2*(idx-1)
+	return binary.LittleEndian.Uint16(node[pos:])
+}
+
+func (node BNode) kvPos(idx uint16) uint16 {
+	util.Assert(idx <= node.nkeys())
+	return 4 + 8*node.nkeys() + 2*node.nkeys() + node.getOffset(idx)
+}
