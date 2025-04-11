@@ -64,3 +64,18 @@ func (node BNode) kvPos(idx uint16) uint16 {
 	util.Assert(idx <= node.nkeys())
 	return 4 + 8*node.nkeys() + 2*node.nkeys() + node.getOffset(idx)
 }
+
+func (node BNode) getKey(idx uint16) []byte {
+	util.Assert(idx < node.nkeys())
+	pos := node.kvPos(idx)
+	klen := binary.LittleEndian.Uint16(node[pos:])
+	return node[pos+4:][:klen]
+}
+
+func (node BNode) getValue(idx uint16) []byte {
+	util.Assert(idx < node.nkeys())
+	pos := node.kvPos(idx)
+	klen := binary.LittleEndian.Uint16(node[pos+0:])
+	vlen := binary.LittleEndian.Uint16(node[pos+2:])
+	return node[pos+4+klen:][:vlen]
+}
