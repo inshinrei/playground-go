@@ -101,3 +101,12 @@ func nodeAppendKV(new BNode, idx uint16, ptr uint64, key []byte, value []byte) {
 	copy(new[pos+4+uint16(len(key)):], value)
 	new.setOffset(idx+1, new.getOffset(idx)+4+uint16(len(key)+len(value)))
 }
+
+func main() {
+	old := BNode(make([]byte, BTREE_PAGE_SIZE))
+	new := BNode(make([]byte, BTREE_PAGE_SIZE))
+	new.setHeader(BNODE_LEAF, 3)
+	nodeAppendKV(new, 0, 0, old.getKey(0), old.getValue(0))
+	nodeAppendKV(new, 1, 0, []byte("k2"), []byte("b"))
+	nodeAppendKV(new, 2, 0, old.getKey(2), old.getValue(2))
+}
