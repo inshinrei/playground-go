@@ -106,6 +106,7 @@ func main() {
 	old := BNode(make([]byte, BTREE_PAGE_SIZE))
 	new := BNode(make([]byte, BTREE_PAGE_SIZE))
 	new.setHeader(BNODE_LEAF, 3)
+
 	nodeAppendKV(new, 0, 0, old.getKey(0), old.getValue(0))
 	nodeAppendKV(new, 1, 0, []byte("k2"), []byte("b"))
 	nodeAppendKV(new, 2, 0, old.getKey(2), old.getValue(2))
