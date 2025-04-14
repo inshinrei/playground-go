@@ -35,6 +35,10 @@ func (node BNode) nkeys() uint16 {
 	return binary.LittleEndian.Uint16(node[2:4])
 }
 
+func (node BNode) nbytes() uint16 {
+	return node.kvPos(node.nkeys())
+}
+
 func (node BNode) setHeader(btype uint16, nkeys uint16) {
 	binary.LittleEndian.PutUint16(node[0:2], btype)
 	binary.LittleEndian.PutUint16(node[2:4], nkeys)
