@@ -110,4 +110,16 @@ func main() {
 	nodeAppendKV(new, 0, 0, old.getKey(0), old.getValue(0))
 	nodeAppendKV(new, 1, 0, []byte("k2"), []byte("b"))
 	nodeAppendKV(new, 2, 0, old.getKey(2), old.getValue(2))
+
+	new = make([]byte, BTREE_PAGE_SIZE)
+	new.setHeader(BNODE_LEAF, 2)
+	nodeAppendKV(new, 0, 0, old.getKey(0), old.getValue(0))
+	nodeAppendKV(new, 1, 0, old.getKey(2), old.getValue(2))
+
+	new = make([]byte, 2*BTREE_PAGE_SIZE)
+	new.setHeader(BNODE_LEAF, 4)
+	nodeAppendKV(new, 0, 0, []byte("a"), []byte("b"))
+	nodeAppendKV(new, 1, 0, old.getKey(0), old.getValue(0))
+	nodeAppendKV(new, 1, 0, old.getKey(1), old.getValue(1))
+	nodeAppendKV(new, 3, 0, old.getKey(2), old.getValue(2))
 }
