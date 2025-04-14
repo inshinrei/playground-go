@@ -106,6 +106,27 @@ func nodeAppendKV(new BNode, idx uint16, ptr uint64, key []byte, value []byte) {
 	new.setOffset(idx+1, new.getOffset(idx)+4+uint16(len(key)+len(value)))
 }
 
+func nodeAppendRange(new BNode, old BNode, dstNew uint16, srcOld uint16, n uint16) {
+	for i := uint16(0); i < n; i++ {
+		dst, src := dstNew+i, srcOld+i
+		nodeAppendKV(new, dst, old.getPtr(src), old.getKey(src), old.getValue(src))
+	}
+}
+
+func leafInsert(new BNode, old BNode, idx uint16, key []byte, value []byte) {
+	new.setHeader(BNODE_LEAF, old.nkeys()+1)
+	nodeAppendRange(new, old, 0, 0, idx)
+	nodeAppendKV(new, idx, 0, key, value)
+	nodeAppendRange(new, old, idx+1, idx, old.nkeys()-idx)
+}
+
+func leafUpdate(new BNode, old BNode, idx uint16, key []byte, value []byte) {
+	new.setHeader(BNODE_LEAF, old.nkeys())
+	nodeAppendRange(new, old, 0, 0, idx)
+	nodeAppendKV(new, idx, 0, key, value)
+	nodeAppendRange(new, old, idx+1, idx+1, old.nkeys()-(idx+1))
+}
+
 func main() {
 	old := BNode(make([]byte, BTREE_PAGE_SIZE))
 	new := BNode(make([]byte, BTREE_PAGE_SIZE))
