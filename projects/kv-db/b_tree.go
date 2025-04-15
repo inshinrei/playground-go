@@ -145,24 +145,58 @@ func nodeLookupLE(node BNode, key []byte) uint16 {
 	return i - 1
 }
 
+func nodeSplit2(left BNode, right BNode, old BNode) {
+	util.Assert(old.nkeys() >= 2)
+
+	nleft := old.nkeys() / 2
+	left_bytes := func() uint16 {
+		return 4 + 8*nleft + 2*nleft + old.getOffset(nleft)
+	}
+	for left_bytes() > BTREE_PAGE_SIZE {
+		nleft--
+	}
+
+	util.Assert(nleft >= 1)
+
+	right_bytes := func() uint16 {
+		return old.nbytes() - left_bytes() + 4
+	}
+	for right_bytes() > BTREE_PAGE_SIZE {
+		nleft++
+	}
+
+	util.Assert(nleft < old.nkeys())
+
+	nright := old.nkeys() - nleft
+	left.setHeader(old.btype(), nleft)
+	right.setHeader(old.btype(), nright)
+	nodeAppendRange(left, old, 0, 0, nleft)
+	nodeAppendRange(right, old, 0, nleft, nright)
+
+	util.Assert(right.nbytes() <= BTREE_PAGE_SIZE)
+}
+
+func nodeSplit3(old BNode) (uint16, [3]BNode) {
+	if old.nbytes() <= BTREE_PAGE_SIZE {
+		old = old[:BTREE_PAGE_SIZE]
+		return 1, [3]BNode{old}
+	}
+	left := BNode(make([]byte, 2*BTREE_PAGE_SIZE))
+	right := BNode(make([]byte, BTREE_PAGE_SIZE))
+	nodeSplit2(left, right, old)
+	if left.nbytes() <= BTREE_PAGE_SIZE {
+		left = left[:BTREE_PAGE_SIZE]
+		return 2, [3]BNode{left, right}
+	}
+	leftleft := BNode(make([]byte, BTREE_PAGE_SIZE))
+	middle := BNode(make([]byte, BTREE_PAGE_SIZE))
+	nodeSplit2(leftleft, middle, left)
+
+	util.Assert(left.nbytes() <= BTREE_PAGE_SIZE)
+
+	return 3, [3]BNode{leftleft, middle, right}
+}
+
 func main() {
-	old := BNode(make([]byte, BTREE_PAGE_SIZE))
-	new := BNode(make([]byte, BTREE_PAGE_SIZE))
-	new.setHeader(BNODE_LEAF, 3)
 
-	nodeAppendKV(new, 0, 0, old.getKey(0), old.getValue(0))
-	nodeAppendKV(new, 1, 0, []byte("k2"), []byte("b"))
-	nodeAppendKV(new, 2, 0, old.getKey(2), old.getValue(2))
-
-	new = make([]byte, BTREE_PAGE_SIZE)
-	new.setHeader(BNODE_LEAF, 2)
-	nodeAppendKV(new, 0, 0, old.getKey(0), old.getValue(0))
-	nodeAppendKV(new, 1, 0, old.getKey(2), old.getValue(2))
-
-	new = make([]byte, 2*BTREE_PAGE_SIZE)
-	new.setHeader(BNODE_LEAF, 4)
-	nodeAppendKV(new, 0, 0, []byte("a"), []byte("b"))
-	nodeAppendKV(new, 1, 0, old.getKey(0), old.getValue(0))
-	nodeAppendKV(new, 1, 0, old.getKey(1), old.getValue(1))
-	nodeAppendKV(new, 3, 0, old.getKey(2), old.getValue(2))
 }
