@@ -204,6 +204,57 @@ type BTree struct {
 	del  func(uint64)
 }
 
+func (tree *BTree) Insert(key []byte, value []byte) error {
+	//if err := checkLimit(key, value); err != nil {
+	//	return err
+	//}
+	if tree.root == 0 {
+		root := BNode(make([]byte, BTREE_PAGE_SIZE))
+		root.setHeader(BNODE_LEAF, 2)
+		nodeAppendKV(root, 0, 0, nil, nil)
+		nodeAppendKV(root, 1, 0, key, value)
+		tree.root = tree.new(root)
+		return nil
+	}
+	node := treeInsert(tree, tree.get(tree.root), key, value)
+	nsplit, split := nodeSplit3(node)
+	tree.del(tree.root)
+	if nsplit > 1 {
+		root := BNode(make([]byte, BTREE_PAGE_SIZE))
+		root.setHeader(BNODE_NODE, nsplit)
+		for i, knode := range split[:nsplit] {
+			ptr, key := tree.new(knode), knode.getKey(0)
+			nodeAppendKV(root, uint16(i), ptr, key, nil)
+		}
+	} else {
+		tree.root = tree.new(split[0])
+	}
+	return nil
+}
+
+var HEADER uint16 = 1
+
+func shouldMerge(tree *BTree, node BNode, idx uint16, updated BNode) (int, BNode) {
+	if updated.nbytes() > BTREE_PAGE_SIZE/4 {
+		return 0, BNode{}
+	}
+	if idx > 0 {
+		sibling := BNode(tree.get(node.getPtr(idx - 1)))
+		merged := sibling.nbytes() + updated.nbytes() - HEADER
+		if merged <= BTREE_PAGE_SIZE {
+			return -1, sibling
+		}
+	}
+	if idx+1 < node.nkeys() {
+		sibling := BNode(tree.get(node.getPtr(idx + 1)))
+		merged := sibling.nbytes() + updated.nbytes() - HEADER
+		if merged <= BTREE_PAGE_SIZE {
+			return +1, sibling
+		}
+	}
+	return 0, BNode{}
+}
+
 func nodeReplaceKidN(tree *BTree, new BNode, old BNode, idx uint16, kids ...BNode) {
 	inc := uint16(len(kids))
 	new.setHeader(BNODE_NODE, old.nkeys()+inc-1)
