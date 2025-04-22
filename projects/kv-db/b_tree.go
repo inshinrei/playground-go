@@ -255,6 +255,10 @@ func shouldMerge(tree *BTree, node BNode, idx uint16, updated BNode) (int, BNode
 	return 0, BNode{}
 }
 
+func nodeDelete(tree *BTree, node BNode, idx uint16, key []byte) BNode {
+
+}
+
 func nodeReplaceKidN(tree *BTree, new BNode, old BNode, idx uint16, kids ...BNode) {
 	inc := uint16(len(kids))
 	new.setHeader(BNODE_NODE, old.nkeys()+inc-1)
