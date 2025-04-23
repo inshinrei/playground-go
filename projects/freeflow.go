@@ -25,7 +25,6 @@ func commonChars(words []string) []string {
 	for _, char := range words[0] {
 		common[char] = true
 	}
-
 	for word := range words {
 		for _, char := range word {
 			curr_set[char] = true
