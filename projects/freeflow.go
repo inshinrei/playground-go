@@ -36,5 +36,6 @@ func commonChars(words []string) []string {
 	for char := range common {
 		str += char
 	}
+
 	return str
 }
