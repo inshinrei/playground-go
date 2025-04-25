@@ -32,6 +32,7 @@ func commonChars(words []string) []string {
 		common = intersection(common, curr_set)
 		curr_set = map[string]bool{}
 	}
+
 	var str string
 	for char := range common {
 		str += char
