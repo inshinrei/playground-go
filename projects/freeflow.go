@@ -1,4 +1,4 @@
 package freeflow
 
-func main(words []string) {
+func main() {
 }
