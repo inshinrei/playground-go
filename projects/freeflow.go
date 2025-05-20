@@ -17,3 +17,19 @@ func maximumImportance(n int, roads [][]int) (ans int64) {
 	}
 	return ans
 }
+
+func checkOverlap(radius, xCenter, yCenter, x1, y1, x2, y2 int) bool {
+	distanceX := distanceToEdge(x1, x2, xCenter)
+	distanceY := distanceToEdge(y1, y2, yCenter)
+	return distanceX*distanceX+distanceY*distanceY <= radius*radius
+}
+
+func distanceToEdge(minEdge, maxEdge, center int) int {
+	if minEdge <= center && center <= maxEdge {
+		return 0
+	}
+	if center < minEdge {
+		return minEdge - center
+	}
+	return center - maxEdge
+}
