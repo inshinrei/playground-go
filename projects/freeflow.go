@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"sync"
 	"time"
 )
 
 func main() {
+	ch()
 }
 
 func maximumImportance(n int, roads [][]int) (ans int64) {
@@ -84,4 +86,47 @@ func runTask1() {
 		fmt.Println("v =", v)
 	}
 	fmt.Println("main duration:", time.Since(start))
+}
+
+// chan
+func writer() <-chan int {
+	ch := make(chan int)
+	wg := &sync.WaitGroup{}
+
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		for i := range 10 {
+			ch <- i
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		for i := range 10 {
+			ch <- i + 5
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		for i := range 10 {
+			ch <- i + 15
+		}
+	}()
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	return ch
+}
+
+func ch() {
+	ch1 := writer()
+
+	for d := range ch1 {
+		fmt.Println("ch1 =", d)
+	}
 }
