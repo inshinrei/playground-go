@@ -1,6 +1,11 @@
 package main
 
-import "sort"
+import (
+	"fmt"
+	"math/rand"
+	"sort"
+	"time"
+)
 
 func main() {
 }
@@ -52,4 +57,31 @@ func per() {
 		age:  2,
 	}
 	changePerson(&person)
+}
+
+// task 1
+func processData(v int) int {
+	time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+	return v * 2
+}
+
+func processParallel(in, out chan int, numWorkers int) {}
+
+func runTask1() {
+	in := make(chan int)
+	out := make(chan int)
+
+	go func() {
+		for i := range 10 {
+			in <- i
+		}
+		close(in)
+	}()
+
+	start := time.Now()
+	processParallel(in, out, 5)
+	for v := range out {
+		fmt.Println("v =", v)
+	}
+	fmt.Println("main duration:", time.Since(start))
 }
