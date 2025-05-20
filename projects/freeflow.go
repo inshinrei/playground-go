@@ -33,3 +33,23 @@ func distanceToEdge(minEdge, maxEdge, center int) int {
 	}
 	return center - maxEdge
 }
+
+type Person struct {
+	name string
+	age  uint8
+}
+
+func changePerson(person **Person) {
+	*person = &Person{
+		name: "A",
+		age:  25,
+	}
+}
+
+func per() {
+	person := &Person{
+		name: "B",
+		age:  2,
+	}
+	changePerson(&person)
+}
