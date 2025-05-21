@@ -171,3 +171,23 @@ func cont1() {
 		}
 	}
 }
+
+// task 2
+func randomTimework() {
+	time.Sleep(time.Duration(rand.Intn(100)) * time.Second)
+}
+
+func predictableTimework() {
+	ch := make(chan struct{})
+
+	go func() {
+		randomTimework()
+		close(ch)
+	}()
+
+	select {
+	case <-ch:
+	case <-time.After(3 * time.Second):
+		panic("timed out")
+	}
+}
