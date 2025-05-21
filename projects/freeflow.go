@@ -10,7 +10,22 @@ import (
 )
 
 func main() {
-	ch()
+	nums := [4]int{7, 1, 5, 4}
+	maximumDifference(nums[0:4])
+}
+
+func maximumDifference(nums []int) int {
+	var ans = -1
+	var mn = nums[0]
+
+	for _, v := range nums {
+		fmt.Println(v, mn)
+		if v > mn {
+			ans = max(ans, v-mn)
+		}
+		mn = min(mn, v)
+	}
+	return ans
 }
 
 func maximumImportance(n int, roads [][]int) (ans int64) {
