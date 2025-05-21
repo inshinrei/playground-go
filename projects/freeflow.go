@@ -130,3 +130,14 @@ func ch() {
 		fmt.Println("ch1 =", d)
 	}
 }
+
+func doubler(x int) int {
+	time.Sleep(5 * time.Second)
+	return x * 2
+}
+
+//func writer1() <-chan int {
+//	ch := make(chan int)
+
+//ctx, cancel = context.WithTimeout(context.Background, 5*time.Second)
+//}
