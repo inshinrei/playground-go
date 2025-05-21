@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"sort"
@@ -141,3 +142,32 @@ func doubler(x int) int {
 
 //ctx, cancel = context.WithTimeout(context.Background, 5*time.Second)
 //}
+
+func cont1() {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	ch := make(chan int)
+
+	go func() {
+		for i := range 1000 {
+			select {
+			case ch <- i:
+			case <-ctx.Done():
+				break
+			}
+		}
+	}()
+
+	for {
+		select {
+		case v, ok := <-ch:
+			if !ok {
+				return
+			}
+			fmt.Println("ch1 =", v)
+		case <-ctx.Done():
+			return
+		}
+	}
+}
