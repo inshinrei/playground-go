@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"runtime"
 	"sync"
 	"sync/atomic"
 )
@@ -17,6 +19,7 @@ type BrokenMutex struct {
 
 func (m *BrokenMutex) Lock() {
 	for !m.state.CompareAndSwap(unlocked, locked) {
+		runtime.Gosched()
 	}
 }
 
@@ -43,4 +46,37 @@ func main() {
 
 	wg.Wait()
 	fmt.Printf("%d\n", value)
+}
+
+func fanIn(ctx context.Context, chans []chan int) chan int {
+	outCh := make(chan int)
+
+	go func() {
+		wg := &sync.WaitGroup{}
+		wg.Add(len(chans))
+		for _, ch := range chans {
+			go func() {
+				defer wg.Done()
+				for {
+					select {
+					case v, ok := <-ch:
+						if !ok {
+							return
+						}
+						select {
+						case outCh <- v:
+						case <-ctx.Done():
+							return
+						}
+					case <-ctx.Done():
+						return
+					}
+				}
+			}()
+		}
+		wg.Wait()
+		close(outCh)
+	}()
+
+	return outCh
 }

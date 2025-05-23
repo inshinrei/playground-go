@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	nums := [4]int{7, 1, 5, 4}
-	maximumDifference(nums[0:4])
+	nums := []int{5, 6, 3, 4, 1}
+	maximumDifference(nums)
 }
 
 func maximumDifference(nums []int) int {
