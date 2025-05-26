@@ -80,3 +80,11 @@ func fanIn(ctx context.Context, chans []chan int) chan int {
 
 	return outCh
 }
+
+func fanOut(ch chan int, n int) []chan int {
+	outChs := make([]chan int, n)
+	for i := range n {
+		outChs[i] = make(chan int)
+	}
+	return outChs
+}
