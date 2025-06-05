@@ -2,20 +2,26 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 func main() {
-	a := 10
-	goto skip
-	b := 20
-skip:
-	c := 30
-	fmt.Println(a, b, c)
-	if c > a {
-		goto inner
+	s := make([]int, 100)
+	for i := 0; i < 100; i++ {
+		s[i] = rand.Intn(100)
 	}
-	if a < b {
-	inner:
-		fmt.Println(a, b, c)
+	fmt.Println(s)
+
+	for _, v := range s {
+		switch {
+		case v%2 == 0 && v%3 == 0:
+			fmt.Println("six")
+		case v%2 == 0:
+			fmt.Println("two")
+		case v%3 == 0:
+			fmt.Println("three")
+		default:
+			fmt.Println("un")
+		}
 	}
 }
